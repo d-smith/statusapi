@@ -1,0 +1,6 @@
+main
+*.zip
+.ipynb_checkpoints/
+serverless-output.yml
+vendor/
+setenv
