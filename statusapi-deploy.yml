@@ -30,10 +30,15 @@ Resources:
         Variables:
           SUBSCRIPTION_TABLE: foobar
       Events:
-        GetEvent:
+        GetInstances:
           Type: Api
           Properties:
             Path: /instances
+            Method: get
+        GetInstance:
+          Type: Api
+          Properties:
+            Path: /instances/{id}
             Method: get
 
 
