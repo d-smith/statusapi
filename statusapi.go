@@ -8,6 +8,22 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+func isListRequest(request events.APIGatewayProxyRequest) bool {
+	if request.Path == "/instances" {
+		return true
+	}
+
+	if request.Path == "/instances/" && len(request.PathParameters) == 0 && len(request.QueryStringParameters) == 0{
+		return true
+	}
+
+	return false
+}
+
+func getInstanceId(request events.APIGatewayProxyRequest)(string,error) {
+	return "", nil
+}
+
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Printf("Processing request data %s for request %v.\n", request.RequestContext.RequestID, request)
 	fmt.Printf("Body size = %d.\n", len(request.Body))
