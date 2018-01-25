@@ -6,22 +6,48 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"errors"
+	"strings"
+)
+
+var (
+	ErrInvalidInstancePath = errors.New("Invalid path")
+	ErrMissingInstanceId = errors.New("Missing parameter")
 )
 
 func isListRequest(request events.APIGatewayProxyRequest) bool {
-	if request.Path == "/instances" {
-		return true
+	if len(request.PathParameters) > 0 || len(request.QueryStringParameters)  > 0 {
+		return false
 	}
 
-	if request.Path == "/instances/" && len(request.PathParameters) == 0 && len(request.QueryStringParameters) == 0{
+	switch request.Path {
+	case "/instances":
 		return true
+	case "/instances/":
+		return true
+	default:
+		return false
 	}
 
-	return false
 }
 
 func getInstanceId(request events.APIGatewayProxyRequest)(string,error) {
-	return "", nil
+	if strings.HasPrefix(request.Path, "/instances") == false {
+		return "", ErrInvalidInstancePath
+	}
+
+	var paramMap map[string]string = request.QueryStringParameters
+	if len(request.PathParameters) > 0 {
+		paramMap = request.PathParameters
+	}
+
+	id := paramMap["id"]
+	switch id {
+	case "":
+		return "", ErrMissingInstanceId
+	default:
+		return id, nil
+	}
 }
 
 func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -33,10 +59,7 @@ func handleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (
 	// If path is /instances/<something> verify there's one path param - return the instance identified by that param
 	// If path is /instances and there are query params extract id value - return the instance identified by that param
 
-//	fmt.Println("Headers:")
-//	for key, value := range request.Headers {
-//		fmt.Printf("    %s: %s\n", key, value)
-//	}
+
 
 	fmt.Println("request path is", request.Path)
 
